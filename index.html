@@ -6,6 +6,15 @@
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Neto - Avance de Ventas</title>
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function(OneSignal) {
+await OneSignal.init({
+appId: "81c21f57-8ac2-48c5-b09f-156311909bdd",
+});
+});
+</script>
 <style>
 :root{--blue:#1D4ED8;--blue-dark:#1E3A8A;--blue-light:#DBEAFE;--blue-mid:#3B82F6;--orange:#F97316;--orange-light:#FFF7ED;--green:#16A34A;--red:#DC2626;--text:#1E293B;--text-mid:#475569;--text-light:#94A3B8;--bg:#FFF;--bg-soft:#F8FAFC;--border-light:#BFDBFE}
 *{margin:0;padding:0;box-sizing:border-box}
