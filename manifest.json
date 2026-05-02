@@ -1,0 +1,36 @@
+{
+  "name": "Neto - Avance de Ventas",
+  "short_name": "Neto Ventas",
+  "description": "Avance de Ventas Veracruz — Captura y seguimiento de ventas por zona",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1D4ED8",
+  "background_color": "#1E3A8A",
+  "lang": "es-MX",
+  "icons": [
+    {
+      "src": "logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Ver Ventas Hoy",
+      "short_name": "Hoy",
+      "description": "Abre directamente el resumen del día",
+      "url": "./"
+    }
+  ]
+}
