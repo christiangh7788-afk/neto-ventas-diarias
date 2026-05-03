@@ -1,86 +1,79 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Neto - Avance de Ventas</title>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <style>
-  :root { --primary-color: #007bff; --text-main: #333; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; }
-  
-  /* Estilos del Modal */
+  :root { --primary-color: #007bff; }
+  body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; color: #333; }
   .notif-modal-container { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-  .notif-modal-content { background: white; border-radius: 20px; width: 100%; max-width: 380px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: slideUp 0.3s ease-out; }
-  .notif-modal-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid #f0f0f0; }
-  .notif-modal-title { font-weight: 800; font-size: 20px; color: var(--text-main); }
-  .notif-modal-subtitle { font-size: 14px; color: #666; margin-top: 8px; line-height: 1.4; }
-  .notif-modal-body { padding: 20px; }
-  .notif-modal-feature { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 18px; }
-  .notif-modal-feature-icon { font-size: 24px; background: #f0f7ff; padding: 10px; border-radius: 12px; }
-  .notif-modal-feature-text { font-size: 14px; font-weight: 600; color: #333; margin-top: 2px; }
-  .notif-modal-feature-text span { display: block; font-weight: normal; font-size: 12px; color: #777; margin-top: 2px; }
-  .notif-modal-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-  
-  /* Botones */
-  .notif-btn-primary { background: var(--primary-color); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.2s; }
-  .notif-btn-primary:active { background: #0056b3; }
-  .notif-btn-secondary { background: #f0f0f0; color: #444; border: none; padding: 12px; border-radius: 10px; font-size: 14px; cursor: pointer; }
-  .notif-btn-text { background: none; border: none; color: #bbb; font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 5px; }
-
-  /* Contenedor de Configuración */
-  #settings-notif-section { display: none; transition: opacity 0.3s; }
-
-  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .notif-modal-content { background: white; border-radius: 20px; width: 100%; max-width: 380px; padding: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+  .notif-btn-primary { background: var(--primary-color); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 15px; }
+  #settings-notif-section { display: none; padding: 20px; }
 </style>
+</head>
+<body>
+
+<div id="main-content" style="padding: 20px; text-align: center;">
+    <h2>Cargando Dashboard...</h2>
+    <p>Si ves esto, la estructura básica está funcionando.</p>
+</div>
+
+<div id="notif-modal-container" class="notif-modal-container">
+  <div class="notif-modal-content">
+    <h3 style="margin-top:0">🔔 Activar Notificaciones</h3>
+    <p style="font-size: 14px; color: #666;">Recibe recordatorios de tus ventas directamente en tu dispositivo.</p>
+    <button class="notif-btn-primary" onclick="handlePushActivation()">Activar ahora</button>
+    <button style="background:none; border:none; color:#999; margin-top:10px; cursor:pointer;" onclick="closeNotifModal()">Más tarde</button>
+  </div>
+</div>
+
+<div id="settings-notif-section">
+  <div style="background: white; border-radius: 15px; padding: 20px; border: 1px solid #e0e0e0;">
+    <h4 style="margin-top: 0;">Configuración de Alertas</h4>
+    <button class="notif-btn-primary" onclick="handlePushActivation()">Habilitar Notificaciones</button>
+  </div>
+</div>
 
 <script>
-window.OneSignalDeferred = window.OneSignalDeferred || [];
-OneSignalDeferred.push(async function(OneSignal) {
-  await OneSignal.init({
-    appId: "81c21f57-8ac2-48c5-b09f-156311909bdd",
-    serviceWorkerPath: "/OneSignalSDK.sw.js",
-    allowLocalhostAsSecureOrigin: true,
-  });
-
-  // Función para gestionar la visibilidad de la interfaz según suscripción
-  async function checkSubscriptionStatus() {
-    const isSubscribed = await OneSignal.User.PushSubscription.optedIn;
-    const hasDismissed = localStorage.getItem('notif_modal_dismissed');
-    
-    // 1. Controlar Sección de Configuración
-    const settingsSec = document.getElementById('settings-notif-section');
-    if (settingsSec) {
-      settingsSec.style.display = isSubscribed ? 'none' : 'block';
-    }
-
-    // 2. Controlar Modal de Bienvenida
-    const modal = document.getElementById('notif-modal-container');
-    if (!isSubscribed && !hasDismissed) {
-      modal.style.display = 'flex';
-    } else {
-      modal.style.display = 'none';
-    }
-  }
-
-  // Ejecutar al inicio
-  checkSubscriptionStatus();
-
-  // Escuchar cambios (por si aceptan desde el prompt nativo)
-  OneSignal.User.PushSubscription.addEventListener("change", checkSubscriptionStatus);
+// Manejo de errores para que no se quede en blanco
+window.addEventListener('error', function(e) {
+    console.log("Error detectado, desbloqueando pantalla...");
+    document.getElementById('main-content').innerHTML = "<h3>Error al cargar notificaciones.</h3><p>La app sigue funcionando, pero revisa el AppID.</p>";
 });
 
-// Función accionada por botones (Gesto de usuario requerido por iOS)
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function(OneSignal) {
+  try {
+    await OneSignal.init({
+      appId: "81c21f57-8ac2-48c5-b09f-156311909bdd",
+      serviceWorkerPath: "/OneSignalSDK.sw.js",
+    });
+
+    const isSubscribed = await OneSignal.User.PushSubscription.optedIn;
+    const hasDismissed = localStorage.getItem('notif_modal_dismissed');
+
+    // Mostrar sección configuración si no está suscrito
+    if (!isSubscribed) {
+      document.getElementById('settings-notif-section').style.display = 'block';
+    }
+
+    // Mostrar modal si no está suscrito ni lo ha cerrado antes
+    if (!isSubscribed && !hasDismissed) {
+      document.getElementById('notif-modal-container').style.display = 'flex';
+    }
+  } catch (err) {
+    console.error("OneSignal no pudo iniciar:", err);
+  }
+});
+
 async function handlePushActivation() {
   OneSignalDeferred.push(async function(OneSignal) {
-    try {
-      console.log("Solicitando permiso de notificación...");
-      await OneSignal.Notifications.requestPermission();
-    } catch (err) {
-      console.error("Error en la solicitud:", err);
-    }
+    await OneSignal.Notifications.requestPermission();
+    closeNotifModal();
   });
 }
 
@@ -93,46 +86,6 @@ function neverAskAgain() {
   closeNotifModal();
 }
 </script>
-</head>
-<body>
-
-<div id="notif-modal-container" class="notif-modal-container">
-  <div class="notif-modal-content">
-    <div class="notif-modal-header">
-      <div class="notif-modal-title">Neto - Avance de Ventas</div>
-      <div class="notif-modal-subtitle">Activa las alertas para mejorar el seguimiento de tu tienda</div>
-    </div>
-    <div class="notif-modal-body">
-      <div class="notif-modal-feature">
-        <div class="notif-modal-feature-icon">⏰</div>
-        <div class="notif-modal-feature-text">Recordatorios de captura<span>Te avisamos para que no olvides subir tus datos</span></div>
-      </div>
-      <div class="notif-modal-feature">
-        <div class="notif-modal-feature-icon">📊</div>
-        <div class="notif-modal-feature-text">Estatus en tiempo real<span>Recibe actualizaciones de tus indicadores clave</span></div>
-      </div>
-      
-      <div class="notif-modal-actions">
-        <button class="notif-btn-primary" onclick="handlePushActivation()">🔔 Activar Notificaciones</button>
-        <button class="notif-btn-secondary" onclick="closeNotifModal()">Más tarde</button>
-        <button class="notif-btn-text" onclick="neverAskAgain()">No mostrar más este mensaje</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="settings-notif-section">
-  <div style="padding: 20px; background: white; border-radius: 15px; margin: 15px; border: 1px solid #e0e0e0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-    <h3 style="margin-top: 0; font-size: 16px; color: #333;">Configuración de Alertas</h3>
-    <p style="font-size: 13px; color: #777; line-height: 1.4; margin-bottom: 15px;">
-      Actualmente no recibes notificaciones. Actívalas para estar al día con el avance de tu zona.
-    </p>
-    <button class="notif-btn-primary" style="width: 100%;" onclick="handlePushActivation()">
-      Habilitar Notificaciones
-    </button>
-  </div>
-</div>
-
 </body>
 </html>
 
