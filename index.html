@@ -541,7 +541,7 @@ const centro=sumRegion(filtered,"CENTRO",allData);const norte=sumRegion(filtered
 const totalVenta=centro.venta+norte.venta+sur.venta;const totalObj=centro.obj+norte.obj+sur.obj;const totalVentaEsp=centro.ventaEsp+norte.ventaEsp+sur.ventaEsp;const totalObjEsp=centro.objEsp+norte.objEsp+sur.objEsp;const totalPct=totalObj>0?Math.round(totalVenta/totalObj*1000)/10:0;
 const rowsHoy=filterRows(allData);
 const tiendaHoy=new Set(rowsHoy.filter(r=>Number(r.venta_real||0)>0).map(r=>String(r.sucursal_id)+"_"+String(r._zona))).size;
-const totalTiendas=243;
+const totalTiendas=239;
 const tiendaSinDatos=totalTiendas-tiendaHoy;
 const fmt=v=>v>=1000000?"$"+(v/1000000).toFixed(1)+"M":v>=1000?"$"+(v/1000).toFixed(0)+"K":"$"+v.toFixed(0);
 const fmtFull=v=>"$"+Math.round(v).toLocaleString("es-MX");
